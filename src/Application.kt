@@ -32,7 +32,7 @@ fun Application.module(testing: Boolean = false) {
         method(HttpMethod.Delete)
         method(HttpMethod.Patch)
         header(HttpHeaders.Authorization)
-        header("MyCustomHeader")
+//        header("MyCustomHeader")
         allowCredentials = true
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
@@ -44,14 +44,14 @@ fun Application.module(testing: Boolean = false) {
     }
 
     // https://ktor.io/servers/features/https-redirect.html#testing
-    if (!testing) {
+ /*   if (!testing) {//This feature will make all the affected HTTP calls perform a redirect to its HTTPS counterpart before processing the call.
         install(HttpsRedirect) {
             // The port to redirect to. By default 443, the default HTTPS port.
             sslPort = 443
             // 301 Moved Permanently, or 302 Found redirect.
             permanentRedirect = true
         }
-    }
+    }*/
     val simpleJwt = SimpleJWT("my-super-secret-for-jwt")
     install(Authentication) {
         jwt {
@@ -103,6 +103,7 @@ fun Application.module(testing: Boolean = false) {
     routing {
         get("/") {
 //            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+
             call.respondRedirect("https://postwoman.io/",true)
         }
 
