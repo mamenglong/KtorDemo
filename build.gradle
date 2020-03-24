@@ -48,4 +48,11 @@ dependencies {
     implementation "io.ktor:ktor-client-gson:$ktor_version"
     implementation "io.ktor:ktor-client-logging-jvm:$ktor_version"
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+
+    //数据库
+    implementation 'org.jetbrains.exposed:exposed-core:0.22.1'
+    implementation 'org.jetbrains.exposed:exposed-dao:0.22.1'
+    implementation 'org.jetbrains.exposed:exposed-jdbc:0.22.1'
+    implementation 'org.jetbrains.exposed:exposed-jodatime:0.22.1'
+    implementation "mysql:mysql-connector-java:5.1.46"
 }
