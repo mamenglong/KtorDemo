@@ -1,26 +1,39 @@
 ### Send POST request with json body
-POST http://0.0.0.0:8082/user/login
+POST {{host}}/user/login
 Content-Type: application/json
 
 {
   "nickName":"menglong",
   "password":"menglong",
-  "account": "9962c5d8-ed0f-4208-a710-44a5d3b5f31b",
+  "account": "menglong0",
   "email": "menglong",
   "id": 0
 
 }
-
+> {%
+client.assert(typeof response.body.data.token !== "undefined", "No token returned");
+client.global.set("auth_token", response.body.data.token);
+%}
 ###
-PUT http://0.0.0.0:8082/user/register
+PUT {{host}}/user/register
 Content-Type: application/json
 
 {
   "nickName":"menglong",
   "password":"menglong",
-  "account": "9962c5d8-ed0f-4208-a710-44a5d3b5f31b",
+  "account": "menglong0",
   "email": "menglong",
   "id": 0
 }
+> {%
+client.assert(typeof response.body.data.token !== "undefined", "No token returned");
+client.global.set("auth_token", response.body.data.token);
+%}
+###
+###  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoibWVuZ2xvbmcwbWVuZ2xvbmcifQ.7qaW1xVjo6A4gpqCm41s7jK_HYTpZRo_mT_O9Vl6NTA
+DELETE {{host}}/user/delete/1
+Authorization: Bearer {{auth_token1}}
 
 ###
+
+

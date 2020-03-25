@@ -2,6 +2,10 @@ package com.mml.ktar
 
 import com.mml.ktar.route.userRoute
 import database.DbSettings
+import exception.AuthenticationException
+import exception.AuthorizationException
+import exception.InvalidCredentialsException
+import exception.TokenVerificationException
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -53,10 +57,10 @@ fun Application.module(testing: Boolean = false) {
                permanentRedirect = true
            }
        }*/
-    val simpleJwt = SimpleJWT("my-super-secret-for-jwt")
+
     install(Authentication) {
         jwt {
-            verifier(simpleJwt.verifier)
+            verifier(SimpleJWT.verifier)
             validate {
                 UserIdPrincipal(it.payload.getClaim("name").asString())
             }
@@ -79,6 +83,19 @@ fun Application.module(testing: Boolean = false) {
         }
         exception<TokenVerificationException> { exception ->
             call.respond(HttpStatusCode.Unauthorized, mapOf("OK" to false, "error" to (exception.message ?: "")))
+        }
+        status(HttpStatusCode.NotFound) {
+            call.respond(
+                TextContent(
+                    "${it.value} ${it.description}",
+                    ContentType.Text.Plain.withCharset(Charsets.UTF_8),
+                    it
+                )
+            )
+        }
+
+        status(HttpStatusCode.Unauthorized) {
+            call.respond(mapOf(Pair("code" , it.value),Pair("msg" , it.description)))
         }
     }
     val client = HttpClient(Apache) {
@@ -144,7 +161,7 @@ fun Application.module(testing: Boolean = false) {
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
         }
-        userRoute(simpleJwt)
+        userRoute()
     }
 }
 
