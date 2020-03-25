@@ -1,6 +1,7 @@
 package com.mml.ktar
 
 import com.mml.ktar.route.userRoute
+import com.mml.ktar.status.installCustom
 import database.DbSettings
 import exception.AuthenticationException
 import exception.AuthorizationException
@@ -84,19 +85,7 @@ fun Application.module(testing: Boolean = false) {
         exception<TokenVerificationException> { exception ->
             call.respond(HttpStatusCode.Unauthorized, mapOf("OK" to false, "error" to (exception.message ?: "")))
         }
-        status(HttpStatusCode.NotFound) {
-            call.respond(
-                TextContent(
-                    "${it.value} ${it.description}",
-                    ContentType.Text.Plain.withCharset(Charsets.UTF_8),
-                    it
-                )
-            )
-        }
-
-        status(HttpStatusCode.Unauthorized) {
-            call.respond(mapOf(Pair("code" , it.value),Pair("msg" , it.description)))
-        }
+        installCustom()
     }
     val client = HttpClient(Apache) {
         followRedirects = true
