@@ -1,8 +1,9 @@
 package com.mml.ktar
 
+import com.mml.ktar.route.userRoute
+import database.DbSettings
 import io.ktor.application.*
 import io.ktor.response.*
-import io.ktor.request.*
 import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.html.*
@@ -44,14 +45,14 @@ fun Application.module(testing: Boolean = false) {
     }
 
     // https://ktor.io/servers/features/https-redirect.html#testing
- /*   if (!testing) {//This feature will make all the affected HTTP calls perform a redirect to its HTTPS counterpart before processing the call.
-        install(HttpsRedirect) {
-            // The port to redirect to. By default 443, the default HTTPS port.
-            sslPort = 443
-            // 301 Moved Permanently, or 302 Found redirect.
-            permanentRedirect = true
-        }
-    }*/
+    /*   if (!testing) {//This feature will make all the affected HTTP calls perform a redirect to its HTTPS counterpart before processing the call.
+           install(HttpsRedirect) {
+               // The port to redirect to. By default 443, the default HTTPS port.
+               sslPort = 443
+               // 301 Moved Permanently, or 302 Found redirect.
+               permanentRedirect = true
+           }
+       }*/
     val simpleJwt = SimpleJWT("my-super-secret-for-jwt")
     install(Authentication) {
         jwt {
@@ -76,7 +77,7 @@ fun Application.module(testing: Boolean = false) {
         exception<InvalidCredentialsException> { exception ->
             call.respond(HttpStatusCode.Unauthorized, mapOf("OK" to false, "error" to (exception.message ?: "")))
         }
-        exception<TokenVerificationException>{exception ->
+        exception<TokenVerificationException> { exception ->
             call.respond(HttpStatusCode.Unauthorized, mapOf("OK" to false, "error" to (exception.message ?: "")))
         }
     }
@@ -99,14 +100,13 @@ fun Application.module(testing: Boolean = false) {
         }
         */
     }
-
+    DbSettings.db
     routing {
         get("/") {
-//            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+            //            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
 
-            call.respondRedirect("https://postwoman.io/",true)
+            call.respondRedirect("https://postwoman.io/", true)
         }
-
         get("/html-dsl") {
             call.respondHtml {
                 body {
@@ -144,38 +144,9 @@ fun Application.module(testing: Boolean = false) {
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
         }
-
-        post("/login-register") {
-            val post = call.receive<LoginRegister>()
-            val user = users.getOrPut(post.user) { User(post.user, post.password) }
-            if (user.password != post.password) throw InvalidCredentialsException("Invalid credentials")
-            call.respond(mapOf("token" to simpleJwt.sign(user.name)))
-        }
-        route("/snippets") {
-            get {
-//                call.respond(mapOf("snippets" to synchronized(snippets) { snippets.toList() }))
-                call.respond(mapOf("ok" to true))
-            }
-            authenticate {
-                post {
-                    val post = call.receive<LoginRegister>()
-                    val principal = call.principal<UserIdPrincipal>() ?: error("No Principal.")
-                    call.respond(mapOf("OK" to true))
-                }
-            }
-            authenticate {
-                delete {
-                    val post = call.receive<LoginRegister>()
-                    val principal = call.principal<UserIdPrincipal>() ?: error("No Principal.")
-                    call.respond(mapOf("OK" to true))
-                }
-            }
-        }
+        userRoute(simpleJwt)
     }
 }
-
-
-data class JsonSampleClass(val hello: String)
 
 fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
     style(type = ContentType.Text.CSS.toString()) {
@@ -191,13 +162,3 @@ suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit) {
     this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
 }
 
-data class PostSnippet(val snippet: PostSnippet.Text) {
-    data class Text(val text: String)
-}
-/*
-data class Snippet(val user: String, val text: String)
-
-val snippets = Collections.synchronizedList(mutableListOf(
-    Snippet(user = "test", text = "hello"),
-    Snippet(user = "test", text = "world")
-))*/

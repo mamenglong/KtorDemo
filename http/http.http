@@ -1,0 +1,26 @@
+### Send POST request with json body
+POST http://0.0.0.0:8082/user/login
+Content-Type: application/json
+
+{
+  "nickName":"menglong",
+  "password":"menglong",
+  "account": "9962c5d8-ed0f-4208-a710-44a5d3b5f31b",
+  "email": "menglong",
+  "id": 0
+
+}
+
+###
+PUT http://0.0.0.0:8082/user/register
+Content-Type: application/json
+
+{
+  "nickName":"menglong",
+  "password":"menglong",
+  "account": "9962c5d8-ed0f-4208-a710-44a5d3b5f31b",
+  "email": "menglong",
+  "id": 0
+}
+
+###

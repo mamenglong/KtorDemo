@@ -10,14 +10,13 @@ open class SimpleJWT(val secret: String) {
     fun sign(name: String): String = JWT.create().withClaim("name", name).sign(algorithm)
 }
 
-class User(val name: String, val password: String)
+class User(val account: String, val password: String,val email:String)
 
 val users = Collections.synchronizedMap(
-    listOf(User("test", "test"))
-        .associateBy { it.name }
+    listOf(User("test", "test","test"))
+        .associateBy { it.account }
         .toMutableMap()
 )
-class LoginRegister(val user: String, val password: String)
 
 class InvalidCredentialsException(message: String) : RuntimeException(message)
 
