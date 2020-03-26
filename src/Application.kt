@@ -1,7 +1,8 @@
 package com.mml.ktar
 
+import com.mml.ktar.exception.installCustomException
 import com.mml.ktar.route.userRoute
-import com.mml.ktar.status.installCustom
+import com.mml.ktar.status.installCustomStatusPages
 import database.DbSettings
 import exception.AuthenticationException
 import exception.AuthorizationException
@@ -73,19 +74,12 @@ fun Application.module(testing: Boolean = false) {
         }
     }
     install(StatusPages) {
-        exception<AuthenticationException> { cause ->
-            call.respond(HttpStatusCode.Unauthorized)
+        installCustomException{
+
         }
-        exception<AuthorizationException> { cause ->
-            call.respond(HttpStatusCode.Forbidden)
+        installCustomStatusPages{
+
         }
-        exception<InvalidCredentialsException> { exception ->
-            call.respond(HttpStatusCode.Unauthorized, mapOf("OK" to false, "error" to (exception.message ?: "")))
-        }
-        exception<TokenVerificationException> { exception ->
-            call.respond(HttpStatusCode.Unauthorized, mapOf("OK" to false, "error" to (exception.message ?: "")))
-        }
-        installCustom()
     }
     val client = HttpClient(Apache) {
         followRedirects = true
@@ -150,7 +144,9 @@ fun Application.module(testing: Boolean = false) {
         get("/json/gson") {
             call.respond(mapOf("hello" to "world"))
         }
-        userRoute()
+        userRoute{
+
+        }
     }
 }
 

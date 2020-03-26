@@ -17,7 +17,8 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
-fun Routing.userRoute() {
+fun Routing.userRoute(block:Routing.()->Unit) {
+    block()
     route("/user") {
         put("register") {
             val post = call.receive<PostUser>()
